@@ -1,4 +1,5 @@
 #include "Sheep.h"
+#include <iostream>
 
 Sheep::Sheep()
 {
@@ -40,51 +41,81 @@ Sheep::~Sheep()
 
 void Sheep::handleInput(float dt)
 {
-	sf::Vector2f inpitDir = { 0, 0 };
+	sf::Vector2f inputDir = { 0, 0 };
 
-	if (m_input->isPressed(sf::Keyboard::Scancode::W))
+	if (m_input->isKeyDown(sf::Keyboard::Scancode::A))
 	{
-		sf::Vector2f inpitDir = { 0, 0 };
+		inputDir.x = -1;
 	}
+	if (m_input->isKeyDown(sf::Keyboard::Scancode::D))
+	{
+		inputDir.x = 1;
+	}
+	if (m_input->isKeyDown(sf::Keyboard::Scancode::W))
+	{
+		inputDir.y = -1;
+	}
+	if (m_input->isKeyDown(sf::Keyboard::Scancode::S))
+	{
+		inputDir.y = 1;
+	}
+
+	if (inputDir.lengthSquared() > 0)
+	{
+		inputDir = inputDir.normalized();
+	}
+
+	m_acceleration = inputDir * ACCELERATION;
+	std::cout << inputDir.x << " : " << inputDir.y << std::endl;
 }
 
 
 void Sheep::update(float dt)
 {
-	setTextureRect(m_currentAnimation->getCurrentFrame());
-	if (m_direction != Direction::NONE)
-		m_currentAnimation->animate(dt);
+	checkWallAndBounce();
+	
+	m_velocity += m_acceleration * dt;
+	m_velocity *= DRAG_FACTOR;
 
-	// move the sheep
-	// for diagonal movement
-	float diagonal_speed = m_speed * APPROX_ONE_OVER_ROOT_TWO * dt;
-	float orthog_speed = m_speed * dt;	// orthogonal movement
+	//std::cout << m_velocity.x << std::endl;
+	move(m_velocity);
+}
 
-	switch (m_direction)
+void Sheep::setWorldSize(sf::Vector2f worldSize)
+{
+	m_worldSize = worldSize;
+}
+
+void Sheep::checkWallAndBounce()
+{
+	/*if (getPosition().x < 0 && m_velocity.x < 0)
 	{
-	case Direction::UP:
-		move({ 0, -orthog_speed });
-		break;
-	case Direction::UP_RIGHT:
-		move({ diagonal_speed, -diagonal_speed });
-		break;
-	case Direction::RIGHT:
-		move({ orthog_speed,0 });
-		break;
-	case Direction::DOWN_RIGHT:
-		move({ diagonal_speed, diagonal_speed });
-		break;
-	case Direction::DOWN:
-		move({ 0, orthog_speed });
-		break;
-	case Direction::DOWN_LEFT:
-		move({ -diagonal_speed, diagonal_speed });
-		break;
-	case Direction::LEFT:
-		move({ -orthog_speed,0 });
-		break;
-	case Direction::UP_LEFT:
-		move({ -diagonal_speed, -diagonal_speed });
-		break;
+		m_velocity.x *= -COEFF_OF_RESTITUTION;
+		std::cout << "Outside left" << std::endl;
+	}
+	if (getPosition().x > m_worldSize.x && m_velocity.x > 0)
+	{
+		m_velocity.x *= -COEFF_OF_RESTITUTION;
+		std::cout << "Outside right" << std::endl;
+	}
+	if (getPosition().y < 0 && m_velocity.y < 0)
+	{
+		m_velocity.y *= -COEFF_OF_RESTITUTION;
+		std::cout << "Outside top" << std::endl;
+	}
+	if (getPosition().y > m_worldSize.y && m_velocity.y > 0)
+	{
+		m_velocity.y *= -COEFF_OF_RESTITUTION;
+		std::cout << "Outside bottom" << std::endl;
+	}*/
+
+	if (
+		getPosition().x < 0 && m_velocity.x < 0 ||
+		getPosition().x > m_worldSize.x && m_velocity.x > 0 ||
+		getPosition().y < 0 && m_velocity.y < 0 ||
+		getPosition().y > m_worldSize.y && m_velocity.y > 0
+		)
+	{
+		m_velocity *= -COEFF_OF_RESTITUTION;
 	}
 }
