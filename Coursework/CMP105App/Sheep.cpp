@@ -40,90 +40,12 @@ Sheep::~Sheep()
 
 void Sheep::handleInput(float dt)
 {
-	// set sheep direction
-	// decrement and check the input buffer.
-	m_inputBuffer -= dt;
-	if (m_inputBuffer > 0)
+	sf::Vector2f inpitDir = { 0, 0 };
+
+	if (m_input->isPressed(sf::Keyboard::Scancode::W))
 	{
-		// not long enough has passed since the last input change, so don't handle input
-		return;
+		sf::Vector2f inpitDir = { 0, 0 };
 	}
-	// grab this to detect changes per frame for later
-	Direction last_dir = m_direction;
-
-	// sheep brake
-	if (m_input->isKeyDown(sf::Keyboard::Scancode::Space))
-	{
-		m_direction = Direction::NONE;
-		return;
-	}
-
-	// Set 8-directional movement based on WASD
-	if (m_input->isKeyDown(sf::Keyboard::Scancode::A))
-	{
-		if (m_input->isKeyDown(sf::Keyboard::Scancode::W))
-		{
-			m_direction = Direction::UP_LEFT;
-			m_currentAnimation = &m_walkUpRight;
-			m_currentAnimation->setFlipped(true);
-		}
-
-
-		else if (m_input->isKeyDown(sf::Keyboard::Scancode::S))
-		{
-			m_direction = Direction::DOWN_LEFT;
-			m_currentAnimation = &m_walkDownRight;
-			m_currentAnimation->setFlipped(true);
-		}
-		else
-		{
-			m_direction = Direction::LEFT;
-			m_currentAnimation = &m_walkRight;
-			m_currentAnimation->setFlipped(true);
-		}
-
-	}
-	else if (m_input->isKeyDown(sf::Keyboard::Scancode::D))
-	{
-		if (m_input->isKeyDown(sf::Keyboard::Scancode::W))
-		{
-			m_direction = Direction::UP_RIGHT;
-			m_currentAnimation = &m_walkUpRight;
-			m_currentAnimation->setFlipped(false);
-		}
-		else if (m_input->isKeyDown(sf::Keyboard::Scancode::S))
-		{
-			m_direction = Direction::DOWN_RIGHT;
-			m_currentAnimation = &m_walkDownRight;
-			m_currentAnimation->setFlipped(false);
-		}
-		else
-		{
-			m_direction = Direction::RIGHT;
-			m_currentAnimation = &m_walkRight;
-			m_currentAnimation->setFlipped(false);
-		}
-
-	}
-	else
-	{
-		if (m_input->isKeyDown(sf::Keyboard::Scancode::W))
-		{
-			m_direction = Direction::UP;
-			m_currentAnimation = &m_walkUp;
-
-		}
-
-		else if (m_input->isKeyDown(sf::Keyboard::Scancode::S))
-		{
-			m_direction = Direction::DOWN;
-			m_currentAnimation = &m_walkDown;
-		}
-	}
-
-	// set input buffer if needed, this makes diagonal movement easier
-	if (m_direction != last_dir)
-		m_inputBuffer = INPUT_BUFFER_LENGTH;
 }
 
 
