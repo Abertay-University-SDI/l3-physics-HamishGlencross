@@ -16,6 +16,8 @@ public:
 	void setWorldSize(sf::Vector2f worldSize);
 	void checkWallAndBounce();
 
+	void collisionResponse(GameObject& collider) override;
+
 private:
 	const float ACCELERATION = 350.0f;   // rate of acceleration, suggested range 10-500
 	const float DRAG_FACTOR = 0.85f;    // friction, suggest range 0.7-0.99

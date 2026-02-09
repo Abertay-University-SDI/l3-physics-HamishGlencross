@@ -8,7 +8,7 @@ Level::Level(sf::RenderWindow& hwnd, Input& in) :
 	if (!m_backgroundTexture.loadFromFile("gfx/field.png"))
 		std::cerr << "Yikes, no field\n";
 	m_background.setTexture(&m_backgroundTexture);
-	m_background.setSize({ background_size, background_size});
+	m_background.setSize({ background_size, background_size });
 
 	// Setup Sheep.
 	if (!m_sheepTexture.loadFromFile("gfx/sheep_sheet.png"))
@@ -17,6 +17,7 @@ Level::Level(sf::RenderWindow& hwnd, Input& in) :
 	m_sheep.setTexture(&m_sheepTexture);
 	m_sheep.setPosition({ background_size / 2.f, background_size / 2.f });
 	m_sheep.setSize({ 64,64 });
+	m_sheep.setCollisionBox(sf::FloatRect({ 16, 16 }, { 32, 32 }));
 	m_sheep.setOrigin({ 32,32 });
 	m_sheep.setWorldSize({ background_size, background_size });
 
@@ -33,10 +34,11 @@ Level::Level(sf::RenderWindow& hwnd, Input& in) :
 		Pig* new_pig = new Pig({ background_size, background_size });
 		new_pig->setTexture(&m_pigTexture);
 		new_pig->setSize({ 64, 64 });
-		new_pig->setPosition(pig_locations[i]);	
+		new_pig->setCollisionBox(sf::FloatRect({ 16, 16 }, { 32, 32 }));
+		new_pig->setPosition(pig_locations[i]);
 		m_pigPointers.push_back(new_pig);
 	}
-	
+
 	m_gameOver = false;	// haven't lost yet.
 
 }
@@ -67,10 +69,30 @@ void Level::update(float dt)
 	sf::Vector2f pos = m_sheep.getPosition();
 	sf::View view = m_window.getView();
 	view.setCenter(pos);
+
+	m_shakeTimer -= dt;
+
+	if (m_shakeTimer > 0)
+	{
+		float x = (rand() % SHAKE_INTENSITY) - (SHAKE_INTENSITY / 2.f) * dt;
+		float y = (rand() % SHAKE_INTENSITY) - (SHAKE_INTENSITY / 2.f) * dt;
+		std::cout << "shake\n";
+		view.move(sf::Vector2f({ x, y }));
+	}
+	
 	m_window.setView(view);
 
 	m_sheep.update(dt);
-	for (auto pig : m_pigPointers) pig->update(dt);
+	for (auto pig : m_pigPointers)
+	{
+		pig->update(dt);
+		if (Collision::checkBoundingBox(m_sheep, *pig))
+		{
+			pig->collisionResponse(m_sheep);
+			m_sheep.collisionResponse(*pig);
+			m_shakeTimer = SHAKE_TIME;
+		}
+	}
 }
 
 // Render level
@@ -82,4 +104,3 @@ void Level::render()
 	m_window.draw(m_sheep);
 	endDraw();
 }
-

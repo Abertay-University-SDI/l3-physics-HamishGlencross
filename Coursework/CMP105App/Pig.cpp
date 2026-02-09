@@ -206,5 +206,9 @@ void Pig::update(float dt)
 		// .. if you aren't going up or down. 
 		}
 	}
-	
+}
+
+void Pig::collisionResponse(GameObject& collider)
+{
+	//std::cout << "Pig Collision\n";
 }

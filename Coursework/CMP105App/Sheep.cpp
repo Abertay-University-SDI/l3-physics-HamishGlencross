@@ -66,7 +66,7 @@ void Sheep::handleInput(float dt)
 	}
 
 	m_acceleration = inputDir * ACCELERATION;
-	std::cout << inputDir.x << " : " << inputDir.y << std::endl;
+	//std::cout << inputDir.x << " : " << inputDir.y << std::endl;
 }
 
 
@@ -117,5 +117,30 @@ void Sheep::checkWallAndBounce()
 		)
 	{
 		m_velocity *= -COEFF_OF_RESTITUTION;
+
+		if (m_velocity.lengthSquared() > 1)
+		{
+			move(m_velocity * m_velocity.lengthSquared()/75.f);
+		}
+		else
+		{
+			move(m_velocity);
+		}
+	}
+}
+
+void Sheep::collisionResponse(GameObject& collider)
+{
+	m_velocity *= -COEFF_OF_RESTITUTION;
+
+	//std::cout << m_velocity.lengthSquared() << std::endl;
+
+	if (m_velocity.lengthSquared() > 1)
+	{
+		move(m_velocity * m_velocity.lengthSquared()/75.f);
+	}
+	else
+	{
+		move(m_velocity);
 	}
 }

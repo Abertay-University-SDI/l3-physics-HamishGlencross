@@ -2,6 +2,7 @@
 
 #include "Framework/BaseLevel.h"
 #include "Framework/GameObject.h"
+#include "Framework/Collision.h"
 #include "Pig.h"
 #include "Sheep.h"
 
@@ -28,4 +29,8 @@ private:
 	sf::Texture m_sheepTexture;
 	std::vector<Pig*> m_pigPointers;
 	Sheep m_sheep;
+
+	float m_shakeTimer;
+	const float SHAKE_TIME = 0.2f;
+	const int SHAKE_INTENSITY = 10;
 };
